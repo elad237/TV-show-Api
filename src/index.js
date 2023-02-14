@@ -1,17 +1,29 @@
+import './css/style.css';
+import getApi from './module/getApi.js';
+import getLikes from './module/getLikes.js';
+import showComment from './module/comments/showComment.js';
 
-import { displayShows } from './modules/display-show';
-import './style.css';
+const getLikesFirst = new Promise((resolve) => {
+  getLikes();
+  setTimeout(() => {
+    resolve('done');
+  }, 300);
+});
 
-window.onload = () =>{
-  fetch("https://api.tvmaze.com/shows")
-    .then((res) => res.json())
-    .then((data) => {
-      const topTenShows = data
-        .filter((show) => show.rating.average)
-        .sort((a, b) => (a.rating.average > b.rating.average ? -1 : 1))
-        .slice(0, 9);
-        
-      displayShows (topTenShows)
-      
-    });
-}
+getLikesFirst.then(() => {
+  new Promise((resolve) => {
+    getApi();
+    setTimeout(() => {
+      resolve('done');
+    }, 300);
+  }).then(() => {
+    showComment();
+  });
+});
+
+const popupClose = document.querySelector('#popup-close');
+const popup = document.querySelector('.popup');
+
+popupClose.addEventListener('click', () => {
+  popup.classList.add('hide');
+});
